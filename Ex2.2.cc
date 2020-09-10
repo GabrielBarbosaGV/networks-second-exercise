@@ -4,6 +4,7 @@
 #include "ns3/point-to-point-module.h"
 #include "ns3/applications-module.h"
 #include "ns3/point-to-point-layout-module.h"
+#include "ns3/stats-module.h"
 
 using namespace ns3;
 
@@ -106,6 +107,26 @@ int main(int argc, char* argv[]) {
   pointToPointRouter.EnablePcap("Ex2.2", sinkNodes);
 
   Ipv4GlobalRoutingHelper::PopulateRoutingTables();
+
+  Simulator::Stop(Seconds(0.1));
+  Simulator::Run();
+
+  GnuplotHelper plotHelper;
+
+  plotHelper.ConfigurePlot(
+    "congestion-window",
+    "Tamanho da Janela de Congestionamento Vs. Tempo",
+    "Tempo (Segundos)",
+    "Tamanho da Janela de Congestionamento"
+  );
+
+  plotHelper.PlotProbe(
+    "ns3::Uinteger32Probe",
+    "/NodeList/*/$ns3::TcpL4Protocol/SocketList/*/CongestionWindow",
+    "Output",
+    "Tamanho da Janela de Congestionamento",
+    GnuplotAggregator::KEY_BELOW
+  );
 
   Simulator::Stop(Seconds(10.0));
   Simulator::Run();
